@@ -1,107 +1,195 @@
-import { Type } from "./types.js";
-import { days, giorniDiDistanza, numDays } from "./utils.js";
+import { NextRenewOptions, NextRenewReturn, NextRenewType } from "./types";
 
-export default class NextRenew {
-  private date: Date = new Date();
-  private interval: number = 1;
-  private type: Type = "month";
-  //
-  private weekDay: number;
-  private monthDay: number;
-  private month: number;
+import { convertToUTC, days, giorniDiDistanza, numDays } from "./utils";
+import {
+  validateDate,
+  validateHours,
+  validateInterval,
+  validateMinutes,
+  validateMonth,
+  validateMonthDay,
+  validateNumberOfRenewals,
+  validateTimezone,
+  validateWeekDay,
+} from "./validators";
 
-  constructor(interval: number = 1, type: Type = "month") {
-    this.interval = interval;
-    this.type = type;
+export default function nextRenew(options: NextRenewOptions): NextRenewReturn {
+  const numberOfRenewals = options.numberOfRenewals || 10;
+  validateNumberOfRenewals(numberOfRenewals);
+
+  let date = new Date(calculate(options));
+
+  date.setUTCHours(0, 0, 0, 0);
+
+  if (typeof options.hours != "undefined") {
+    validateHours(options.hours);
+    date.setUTCHours(options.hours);
+  }
+  if (typeof options.minutes != "undefined") {
+    validateMinutes(options.minutes);
+    date.setUTCMinutes(options.minutes);
   }
 
-  private validateMonthDay(monthDay: number) {
-    if (typeof monthDay == "undefined" || monthDay == null || typeof monthDay != "number") {
-      throw "monthDay must be a valid number";
-    }
-
-    if (monthDay < 1 || monthDay > 31) {
-      throw "monthDay must be between 1 and 31";
-    }
+  if (typeof options.timezone != "undefined") {
+    validateTimezone(options.timezone);
+    date = convertToUTC(date, options.timezone);
   }
 
-  //#region SET
-  public setInterval(inverval: number) {
-    this.interval = inverval;
-    return this;
-  }
-  public setType(type: Type) {
-    this.type = type;
-    return this;
-  }
-  public setWeekDay(weekDay: number) {
-    this.weekDay = weekDay;
-    return this;
-  }
-  public setMonthDay(monthDay: number) {
-    this.validateMonthDay(monthDay);
+  let list: Date[] = [date];
 
-    this.monthDay = monthDay;
-    return this;
-  }
-  public setMonth(month: number) {
-    this.month = month;
-    return this;
-  }
-  public setDate(date: Date) {
-    this.date = date;
-    return this;
-  }
-  //#endregion
+  for (let i = 1; i < numberOfRenewals; i++) {
+    const prevDate = list[i - 1];
+    const nextDate = new Date(calculate({ ...options, from: new Date(prevDate.getTime()) }));
 
-  public nextRenew() {
-    let toReturn: number;
-    const dateInMillis = this.date.getTime();
+    if (typeof options.end_date != "undefined") {
+      validateDate(options.end_date);
 
-    if (this.type == "day") {
-      this.date.setDate(this.date.getDate() + this.interval);
-      toReturn = this.date.getTime();
-    }
-
-    if (this.type == "week") {
-      const startDay = this.date.getDay();
-      const endDay = this.weekDay;
-      toReturn = dateInMillis + days(giorniDiDistanza(startDay, endDay) * this.interval);
-    }
-
-    if (this.type == "month") {
-      this.validateMonthDay(this.monthDay);
-
-      const monthAdder = this.date.getDate() < this.monthDay ? 0 : this.interval;
-
-      this.date.setUTCDate(1);
-      this.date.setUTCMonth(this.date.getMonth() + monthAdder);
-
-      const currentMonth = this.date.getMonth();
-      const currentYear = this.date.getFullYear();
-
-      const currentMonthDays = numDays(currentYear, currentMonth);
-
-      this.date.setUTCDate(this.monthDay > currentMonthDays ? currentMonthDays : this.monthDay);
-
-      toReturn = this.date.getTime();
-    }
-
-    if (this.type == "year") {
-      const renewDate = new Date(this.date.getFullYear(), this.month, this.monthDay);
-
-      if (this.date.getTime() < renewDate.getTime()) {
-        // Ancora da passare, il prossimo rinnovo sarà la data
-        toReturn = renewDate.getTime();
-      } else {
-        this.date.setUTCFullYear(this.date.getFullYear() + this.interval);
-        this.date.setUTCDate(this.monthDay);
-        this.date.setUTCMonth(this.month);
-
-        toReturn = this.date.getTime();
+      if (options.end_date < nextDate) {
+        break;
       }
     }
 
-    return toReturn;
+    list.push(nextDate);
   }
+
+  return {
+    date,
+    list,
+  };
+}
+
+function calculate(options: NextRenewOptions): number {
+  /**
+   * //TODO: Spiegare perchè viene creato un nuovo oggetto new Date(options.from)
+   * in pratica viene presa la referenza quindi va a modificare anche la data principale
+   */
+  const date = options.from ? new Date(options.from) : new Date();
+
+  // date.setUTCHours(0, 0, 0, 0);
+
+  const interval = options.interval || 1;
+
+  validateDate(date);
+  validateInterval(interval);
+
+  let toReturnMillis: number;
+  const dateInMillis = date.getTime();
+
+  if (options.type == "day") {
+    date.setUTCDate(date.getUTCDate() + interval);
+    toReturnMillis = date.getTime();
+  }
+
+  if (options.type == "week") {
+    validateWeekDay(options.weekDay);
+
+    const startDay = date.getUTCDay();
+    const endDay = options.weekDay;
+
+    if (startDay < endDay) {
+      //TODO: Commenti, se l'inizio è minore della fine significa che deve ancora arrivare,
+      // quindi bypassa l'intervallo
+      toReturnMillis = dateInMillis + days(giorniDiDistanza(startDay, endDay));
+    } else {
+      toReturnMillis = dateInMillis + days(giorniDiDistanza(startDay, endDay) + 7 * (interval - 1));
+    }
+  }
+
+  if (options.type == "month") {
+    validateMonthDay(options.monthDay);
+
+    const currentYear = date.getUTCFullYear();
+    const currentMonth = date.getUTCMonth();
+    const currentMonthDays = numDays(currentYear, currentMonth);
+
+    const currentDate = date.getUTCDate();
+
+    let renewalDate: number;
+
+    if (options.monthDay > currentMonthDays) {
+      renewalDate = currentMonthDays;
+    } else {
+      renewalDate = options.monthDay;
+    }
+
+    if (currentDate < renewalDate) {
+      date.setUTCDate(renewalDate);
+    } else {
+      //Se maggiore o uguale
+      date.setUTCDate(1);
+      date.setUTCMonth(currentMonth + interval);
+
+      const nextYear = date.getUTCFullYear();
+      const nextMonth = date.getUTCMonth();
+      const nextMonthDays = numDays(nextYear, nextMonth);
+
+      if (options.monthDay > nextMonthDays) {
+        renewalDate = nextMonthDays;
+      } else {
+        renewalDate = options.monthDay;
+      }
+
+      date.setUTCDate(renewalDate);
+    }
+
+    toReturnMillis = date.getTime();
+  }
+
+  if (options.type == "year") {
+    validateMonthDay(options.monthDay);
+    validateMonth(options.month);
+
+    const currentYear = date.getUTCFullYear();
+    const currentMonth = date.getUTCMonth();
+    const currentDate = date.getUTCDate();
+    let isPassed: boolean = false;
+
+    if (currentMonth > options.month) {
+      isPassed = true;
+    }
+
+    if (currentMonth == options.month) {
+      const currentMonthDays = numDays(currentYear, currentMonth);
+
+      if (options.monthDay > currentMonthDays) {
+        if (currentDate == currentMonthDays) {
+          isPassed = true;
+        } else {
+          isPassed = false;
+        }
+      }
+
+      if (currentDate >= options.monthDay) {
+        isPassed = true;
+      }
+    }
+
+    if (isPassed) {
+      date.setUTCDate(1);
+      date.setUTCFullYear(currentYear + interval, options.month);
+
+      const currentMonthDays = numDays(date.getUTCFullYear(), date.getUTCMonth());
+
+      if (currentMonthDays < options.monthDay) {
+        date.setUTCDate(currentMonthDays);
+      } else {
+        date.setUTCDate(options.monthDay);
+      }
+    } else {
+      date.setUTCDate(1);
+      date.setUTCMonth(options.month);
+
+      const currentMonthDays = numDays(date.getUTCFullYear(), date.getUTCMonth());
+
+      if (currentMonthDays < options.monthDay) {
+        date.setUTCDate(currentMonthDays);
+      } else {
+        date.setUTCDate(options.monthDay);
+      }
+    }
+
+    toReturnMillis = date.getTime();
+  }
+
+  return toReturnMillis;
 }

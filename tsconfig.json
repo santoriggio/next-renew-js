@@ -1,6 +1,11 @@
 {
+  "typeAcquisition": {
+    "include": [
+      "jest"
+    ]
+  },
   "compilerOptions": {
-    "moduleResolution": "nodenext",
+"moduleResolution": "Node",
       "declaration": true,
 
       "module": "es6",
