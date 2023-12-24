@@ -1,5 +1,5 @@
 import nextRenew from "../src/nextRenew";
-import { numDays } from "../src/utils";
+import { convertToUTC, numDays } from "../src/utils";
 
 describe("test numDays function", () => {
   it("test monthDays for 2023", () => {
@@ -343,7 +343,7 @@ describe("last day in month", () => {
       }
     });
   });
-  
+
   it("test yearly renew with startingDate >", () => {
     startingDate.setUTCFullYear(2023);
     startingDate.setUTCMonth(2);
@@ -377,3 +377,72 @@ describe("last day in month", () => {
     });
   });
 });
+
+describe("timezone", () => {
+  const startingDate = new Date("2023-01-15T00:00:00.000Z");
+
+  startingDate.setUTCHours(0, 0, 0, 0);
+
+  const timezone = "America/New_York";
+
+  it("monthly renew with America/New_York as timezone", () => {
+    const result = nextRenew({
+      type: "month",
+      monthDay: 25,
+      from: startingDate,
+      timezone,
+    });
+
+    expect(result.date).toBeInstanceOf(Date);
+
+    const expectedDate = new Date(startingDate);
+    expectedDate.setUTCDate(25);
+
+    expect(result.date).toEqual(convertToUTC(expectedDate, timezone));
+    expect(result.list).toBeInstanceOf(Array);
+    expect(result.list.length).toBeGreaterThan(0);
+
+    result.list.forEach((date, _) => {
+      expect(date).toBeInstanceOf(Date);
+
+      if (_ == 0) {
+        //Se l'indice è 0
+        expect(date).toEqual(result.date);
+      } else {
+        expectedDate.setUTCMonth(expectedDate.getUTCMonth() + 1);
+
+        expect(date).toEqual(convertToUTC(expectedDate, timezone));
+      }
+    });
+  });
+});
+
+// describe("custom hour and minutes", () => {
+//   it("daily renewal", () => {
+//     const startingDate = new Date();
+
+//     it("test daily renewal", () => {
+//       const result = nextRenew({ type: "day" });
+
+//       const expectedDate = new Date(startingDate);
+//       expectedDate.setUTCDate(16);
+
+//       expect(result.date).toEqual(expectedDate);
+//       expect(result.list).toBeInstanceOf(Array);
+
+//       expect(result.list.length).toBeGreaterThan(0);
+
+//       result.list.forEach((date, _) => {
+//         expect(date).toBeInstanceOf(Date);
+
+//         if (_ == 0) {
+//           //Se l'indice è 0
+//           expect(date).toEqual(result.date);
+//         } else {
+//           expectedDate.setUTCDate(expectedDate.getUTCDate() + 1);
+//           expect(date).toEqual(expectedDate);
+//         }
+//       });
+//     });
+//   });
+// });

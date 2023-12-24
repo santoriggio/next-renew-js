@@ -28,21 +28,21 @@ export type NextRenewOptions = {
    */
   end_date?: Date;
 
-  /**
-   * Specifies the hours at which the renewal should take place.
-   * By default, the renewal occurs at midnight (0 hours).
-   * @type number
-   * @default 0
-   */
-  hours?: number;
+  // /**
+  //  * Specifies the hours at which the renewal should take place.
+  //  * By default, the renewal occurs at midnight (0 hours).
+  //  * @type number
+  //  * @default 0
+  //  */
+  // hours?: number;
 
-  /**
-   * Specifies the minutes at which the renewal should take place.
-   * By default, the renewal occurs at the beginning of the specified hour (0 minutes).
-   * @type number
-   * @default 0
-   */
-  minutes?: number;
+  // /**
+  //  * Specifies the minutes at which the renewal should take place.
+  //  * By default, the renewal occurs at the beginning of the specified hour (0 minutes).
+  //  * @type number
+  //  * @default 0
+  //  */
+  // minutes?: number;
 
   /**
    * Specifies the timezone in which the renewals should occur.

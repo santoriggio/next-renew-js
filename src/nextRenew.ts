@@ -21,19 +21,14 @@ export default function nextRenew(options: NextRenewOptions): NextRenewReturn {
 
   date.setUTCHours(0, 0, 0, 0);
 
-  if (typeof options.hours != "undefined") {
-    validateHours(options.hours);
-    date.setUTCHours(options.hours);
-  }
-  if (typeof options.minutes != "undefined") {
-    validateMinutes(options.minutes);
-    date.setUTCMinutes(options.minutes);
-  }
-
-  if (typeof options.timezone != "undefined") {
-    validateTimezone(options.timezone);
-    date = convertToUTC(date, options.timezone);
-  }
+  // if (typeof options.hours != "undefined") {
+  //   validateHours(options.hours);
+  //   date.setUTCHours(options.hours);
+  // }
+  // if (typeof options.minutes != "undefined") {
+  //   validateMinutes(options.minutes);
+  //   date.setUTCMinutes(options.minutes);
+  // }
 
   let list: Date[] = [date];
 
@@ -50,6 +45,14 @@ export default function nextRenew(options: NextRenewOptions): NextRenewReturn {
     }
 
     list.push(nextDate);
+  }
+
+  if (typeof options.timezone != "undefined") {
+    validateTimezone(options.timezone);
+    date = convertToUTC(date, options.timezone);
+    list = list.map((d) => {
+      return (d = convertToUTC(d, options.timezone));
+    });
   }
 
   return {

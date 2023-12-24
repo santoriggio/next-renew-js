@@ -1,11 +1,12 @@
 {
   "name": "next-renew-js",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest --watchAll --verbose"
+    "test": "jest --watchAll --verbose",
+    "test utils": "jest test/utils.test.js --verbose"
   },
   "repository": {
     "type": "git",

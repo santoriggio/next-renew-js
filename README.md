@@ -16,8 +16,6 @@ npm install next-renew-js
 | **from**           | `Date`            | Optional. Specifies the starting date from which the renewal should begin. Default: (current Date). |
 | **numberOfRenewals** | `number`        | Optional. Indicates the total number of renewals that should occur. |
 | **end_date**       | `Date`            | Optional. Specifies an end date for the renewals. |
-| **hours**          | `number`          | Optional. Specifies the hours at which the renewal should take place. Default: `0`. |
-| **minutes**        | `number`          | Optional. Specifies the minutes at which the renewal should take place. Default: `0`. |
 | **timezone**       | `string`          | Optional. Specifies the timezone in which the renewals should occur. Example: If the timezone is set to "America/New_York", the renewal at midnight on December 21 will be at 18:00 (6:00 PM) on the previous day, accounting for the -6-hour offset from UTC. Default: `undefined`. |
 | **type**           | `string`          | Required. Specifies the type of renewal. Choose one of the following: `day`, `week`, `month`, `year`. |
 | **weekDay**        | `number`          | Required for `week` type. Specifies the day of the week for weekly renewal (0 for Monday, and so on). Accepted values: 0 to 6. |
@@ -39,10 +37,10 @@ import nextRenew from "next-renew-js";
 const startingDate = new Date("2023-01-15T00:00:00.000Z")
 
 const options = {
-type: "month",
-monthDay: 25,
-from: startingDate, // Optional (for demonstration purposes)
-
+  type: "month",
+  monthDay: 25,
+  from: startingDate, // Optional (for demonstration purposes)
+};
 
 console.log(result.date); // 2023-01-25T00:00:00.000Z
 console.log(result.list); // [2023-01-25T00:00:00.000Z, 2023-02-25T00:00:00.000Z, 2023-03-25T00:00:00.000Z, ...]
@@ -58,10 +56,10 @@ import nextRenew from "next-renew-js";
 const startingDate = new Date("2023-01-15T00:00:00.000Z")
 
 const options = {
-type: "month",
-monthDay: 31,
-from: startingDate, // Optional (for demonstration purposes)
-
+  type: "month",
+  monthDay: 31,
+  from: startingDate, // Optional (for demonstration purposes)
+};
 
 console.log(result.date); // 2023-01-31T00:00:00.000Z
 console.log(result.list); // [2023-01-31T00:00:00.000Z, 2023-02-28T00:00:00.000Z, 2023-03-31T00:00:00.000Z, ...]

@@ -1,3 +1,5 @@
+import { validateTimezone } from "./validators";
+
 export function days(days: number) {
   return days * 24 * 60 * 60 * 1000;
 }
@@ -34,13 +36,21 @@ export function numDays(y: number, m: number): number {
   // return date.getUTCDate();
 }
 
-export function convertToUTC(inputDate: Date, inputTimeZone: string): Date {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: inputTimeZone,
+export function convertToUTC(date: Date, timezone: string): Date {
+  validateTimezone(timezone);
+
+  const options: Intl.DateTimeFormatOptions = {
+    timeZone: timezone,
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
     hour12: false,
-    dateStyle: "short",
-    timeStyle: "medium",
-  });
+  };
+
+  const formatted = new Intl.DateTimeFormat("en-US", options).formatToParts(date);
 
   let obj = {
     year: 0,
@@ -51,13 +61,15 @@ export function convertToUTC(inputDate: Date, inputTimeZone: string): Date {
     second: 0,
   };
 
-  formatter.formatToParts(inputDate).forEach((x) => {
+  formatted.forEach((x) => {
     if (typeof obj[x.type] != "undefined") {
       obj[x.type] = x.value;
     }
   });
 
-  const formatted = new Date(Number("20" + obj.year), obj.month - 1, obj.day, obj.hour, obj.minute);
+  const newDate = Date.UTC(obj.year, obj.month, obj.day, obj.hour, obj.minute, obj.second);
 
-  return formatted;
+  const d = new Date(newDate);
+
+  return d;
 }
