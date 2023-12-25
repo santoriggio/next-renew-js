@@ -1,4 +1,4 @@
-import { validateTimezone } from "./validators";
+import { validateDate, validateTimezone } from "./validators";
 
 export function days(days: number) {
   return days * 24 * 60 * 60 * 1000;
@@ -67,9 +67,31 @@ export function convertToUTC(date: Date, timezone: string): Date {
     }
   });
 
-  const newDate = Date.UTC(obj.year, obj.month, obj.day, obj.hour, obj.minute, obj.second);
+  const newDate = Date.UTC(obj.year, obj.month - 1, obj.day, obj.hour, obj.minute, obj.second);
 
   const d = new Date(newDate);
 
   return d;
+}
+export function cloneDate(date: Date = new Date(), locale: boolean = false): Date {
+  let toReturn: Date = new Date();
+
+  if (typeof date != "undefined" && date != null && date instanceof Date) {
+    toReturn = new Date(date.getTime());
+  }
+
+  if (locale) {
+    toReturn = dateToLocale(date);
+  }
+
+  return toReturn;
+}
+
+export function dateToLocale(date: Date): Date {
+  validateDate(date);
+
+  const offsetMinutes = date.getTimezoneOffset();
+
+  // Calcola la data locale aggiungendo l'offset
+  return new Date(date.getTime() - offsetMinutes * 60 * 1000);
 }

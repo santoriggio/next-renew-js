@@ -1,3 +1,4 @@
-import NextRenew from "./nextRenew.js";
-export { days, hours, minutes, numDays } from "./utils.js";
-export default NextRenew;
+import nextRenew from "./nextRenew.js";
+export { days, hours, minutes, numDays } from "./utils";
+export { NextRenewReturn, NextRenewOptions } from "./types";
+export default nextRenew;

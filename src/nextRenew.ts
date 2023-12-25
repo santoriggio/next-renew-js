@@ -196,3 +196,4 @@ function calculate(options: NextRenewOptions): number {
 
   return toReturnMillis;
 }
+

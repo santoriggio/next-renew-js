@@ -4,6 +4,7 @@ export type NextRenewReturn = {
   date: Date;
   list: Date[];
 };
+
 export type NextRenewOptions = {
   /**
    * Represents the interval in which the renewal occurs.
@@ -52,6 +53,10 @@ export type NextRenewOptions = {
    * the returned value will be at 18:00 (6:00 PM) on the previous day, accounting for the -6-hour offset from UTC.
    */
   timezone?: string;
+
+  monthDay?: number;
+  month?: number;
+  weekDay?: number;
 } & (NextRenewDay | NextRenewWeek | NextRenewMonth | NextRenewYear);
 
 type NextRenewDay = {
@@ -109,4 +114,13 @@ type NextRenewYear = {
    */
 
   month: number;
+};
+
+export type DailyRenewOptions = {
+  interval?: number;
+  from?: Date;
+  hours?: number;
+  minutes?: number;
+  timezone?: string;
+  locale?: boolean;
 };

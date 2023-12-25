@@ -1,5 +1,9 @@
 # next-renew-js
 
+## ⚠️ Under Development
+
+**Note: This library is currently under active development and is not recommended for production use.**
+
 The next-renew-js library efficiently calculates upcoming renewal dates with flexible interval options. It seamlessly handles daily, weekly, monthly, or yearly scenarios, allowing you to customize calculations based on parameters like interval and start date. Ensure accurate results, even in special cases, for precise renewal date integration.
 
 ## Installation

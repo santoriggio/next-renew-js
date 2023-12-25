@@ -1,19 +1,20 @@
 {
   "name": "next-renew-js",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest --watchAll --verbose",
-    "test utils": "jest test/utils.test.js --verbose"
+    "test:utils": "jest test/utils.test.js --verbose",
+    "test:calc": "jest --watch test/calc.test.js --verbose"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/santoriggio/next-renew-js.git"
   },
   "keywords": [
-    "renew",
+    "renewal",
     "javascript",
     "subscription"
   ],
