@@ -416,33 +416,3 @@ describe("timezone", () => {
     });
   });
 });
-
-// describe("custom hour and minutes", () => {
-//   it("daily renewal", () => {
-//     const startingDate = new Date();
-
-//     it("test daily renewal", () => {
-//       const result = nextRenew({ type: "day" });
-
-//       const expectedDate = new Date(startingDate);
-//       expectedDate.setUTCDate(16);
-
-//       expect(result.date).toEqual(expectedDate);
-//       expect(result.list).toBeInstanceOf(Array);
-
-//       expect(result.list.length).toBeGreaterThan(0);
-
-//       result.list.forEach((date, _) => {
-//         expect(date).toBeInstanceOf(Date);
-
-//         if (_ == 0) {
-//           //Se l'indice è 0
-//           expect(date).toEqual(result.date);
-//         } else {
-//           expectedDate.setUTCDate(expectedDate.getUTCDate() + 1);
-//           expect(date).toEqual(expectedDate);
-//         }
-//       });
-//     });
-//   });
-// });

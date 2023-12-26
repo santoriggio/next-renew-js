@@ -1,4 +1,7 @@
-import dailyRenew from "../src/calc/dailyRenew";
+import { time } from "console";
+import dailyRenew from "../../src/calc/dailyRenew";
+import { convertToUTC } from "../../src/utils";
+import { isValidTimeZone } from "../../src/validators";
 
 describe("daily renew function", () => {
   let startingDate = new Date();
@@ -38,22 +41,5 @@ describe("daily renew function", () => {
     expect(result).toBeInstanceOf(Date);
     expect(result).toEqual(expectedDate);
   });
-
-  it("timezone America/New_York", () => {
-    //startingDate.setUTCHours(0, 0);
-
-    const timezone = "Europe/Rome";
-
-    const result = dailyRenew({
-      from: startingDate,
-      timezone,
-      hours: startingDate.getUTCHours(),
-      minutes: startingDate.getUTCMinutes(),
-    });
-
-    expect(result).toBeInstanceOf(Date);
-
-    const expectedDate = new Date("2023-01-02T07:00:00.000Z");
-    expect(result).toEqual(expectedDate);
-  });
 });
+

@@ -122,5 +122,38 @@ export type DailyRenewOptions = {
   hours?: number;
   minutes?: number;
   timezone?: string;
-  locale?: boolean;
+  useLocale?: boolean;
+};
+export type WeeklyRenewOptions = {
+  interval?: number;
+  from?: Date;
+  hours?: number;
+  minutes?: number;
+  weekDay: number;
+  timezone?: string;
+  useLocale?: boolean;
+};
+
+export type ValidatorOptions = {
+  value: any;
+  defaultValue?: any;
+  name: string;
+  rules: Rule[];
+};
+
+type Rule = StringRule | NumberRule | DateRule;
+
+type StringRule = {
+  type: "string";
+  isTimezone?: boolean;
+};
+type NumberRule = {
+  type: "number";
+  min?: number;
+  max?: number;
+  integerOnly?: boolean;
+};
+
+type DateRule = {
+  type: "date";
 };

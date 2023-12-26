@@ -1,3 +1,58 @@
+import { ValidatorOptions } from "./types";
+
+export default function validator(options: ValidatorOptions) {
+  const { value, name, defaultValue, rules } = options;
+  let isValid: boolean = true;
+
+  if (typeof value == "undefined" || value == null) {
+    isValid = false;
+  }
+
+  if (isValid) {
+    for (const rule of rules) {
+      switch (rule.type) {
+        case "number":
+          if (typeof value !== "number") {
+            isValid = false;
+          }
+
+          if (typeof rule.min != "undefined" && value < rule.min) {
+            isValid = false;
+          }
+          if (typeof rule.max != "undefined" && value > rule.max) {
+            isValid = false;
+          }
+          if (rule.integerOnly && !Number.isInteger(value)) {
+            isValid = false;
+          }
+
+          break;
+        case "string":
+          if (typeof value !== "string") {
+            isValid = false;
+          }
+
+          if (rule.isTimezone) {
+            isValid = isValidTimeZone(value);
+          }
+
+          break;
+        case "date":
+          if (!(value instanceof Date)) {
+            isValid = false;
+          }
+          break;
+      }
+
+      if (!isValid) {
+        break; // Interrompi la verifica di ulteriori regole una volta trovata una violazione
+      }
+    }
+  }
+
+  return isValid ? value : defaultValue;
+}
+
 export function validateMonthDay(monthDay: number) {
   if (typeof monthDay == "undefined" || monthDay == null || typeof monthDay != "number") {
     throw "monthDay must be a valid number";
@@ -17,6 +72,24 @@ export function validateWeekDay(weekDay: number) {
     throw "weekDay must be between 0 and 6";
   }
 }
+
+export const isValidTimeZone = (tz: unknown): boolean => {
+  try {
+    if (!Intl || !Intl.DateTimeFormat().resolvedOptions().timeZone) {
+      return false;
+    }
+
+    if (typeof tz !== "string") {
+      return false;
+    }
+
+    // throws an error if timezone is not valid
+    Intl.DateTimeFormat(undefined, { timeZone: tz });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
 
 export function validateDate(date: Date) {
   if (date instanceof Date) {
@@ -77,20 +150,27 @@ export function validateNumberOfRenewals(numberOfRenewals: number) {
 }
 
 export function validateHours(hours: number) {
+  let message: string;
+
   if (typeof hours === "undefined") {
-    throw "hours can't be undefined";
+    message = `hours can't be undefined`;
   }
 
   if (hours === null) {
-    throw "hours can't be null";
+    message = "hours can't be null";
   }
 
   if (typeof hours !== "number") {
-    throw "hours must be a number";
+    message = "hours must be a number";
   }
 
   if (hours < 0 || hours > 23) {
-    throw "hours must be between 0 and 23";
+    message = "hours must be between 0 and 23";
+  }
+
+  if (message) {
+    console.warn(message, `received: ${hours}`);
+    hours = 0;
   }
 }
 

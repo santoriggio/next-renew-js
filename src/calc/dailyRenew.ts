@@ -1,6 +1,12 @@
+import { time } from "console";
 import { DailyRenewOptions } from "../types";
 import { cloneDate, convertToUTC, dateToLocale } from "../utils";
-import { validateHours, validateInterval, validateMinutes, validateTimezone } from "../validators";
+import validator, {
+  validateHours,
+  validateInterval,
+  validateMinutes,
+  validateTimezone,
+} from "../validators";
 
 /**
  * @return date
@@ -8,20 +14,31 @@ import { validateHours, validateInterval, validateMinutes, validateTimezone } fr
 
 export default function dailyRenew(options: DailyRenewOptions = {}): Date {
   try {
-    const date = cloneDate(options.from, options.locale);
+    const date = cloneDate(options.from, options.useLocale);
     //Set the seconds and milliseconds at 0
 
     date.setUTCSeconds(0, 0);
 
-    const interval = options.interval || 1;
+    const interval = validator({
+      value: options.interval,
+      defaultValue: 1,
+      name: "interval",
+      rules: [{ type: "number", min: 1, integerOnly: true }],
+    });
 
-    //Create and validate hours and minutes
-    const hours = options.hours || 0;
-    const minutes = options.minutes || 0;
+    const hours = validator({
+      value: options.hours,
+      defaultValue: 0,
+      name: "hours",
+      rules: [{ type: "number", min: 0, max: 23, integerOnly: true }],
+    });
 
-    validateInterval(interval);
-    validateHours(hours);
-    validateMinutes(minutes);
+    const minutes = validator({
+      value: options.minutes,
+      defaultValue: 0,
+      name: "minutes",
+      rules: [{ type: "number", min: 0, max: 59, integerOnly: true }],
+    });
 
     const currentHours = date.getUTCHours();
     const currentMinutes = date.getUTCMinutes();
@@ -36,8 +53,7 @@ export default function dailyRenew(options: DailyRenewOptions = {}): Date {
 
     date.setUTCHours(hours, minutes);
 
-    if (typeof options.timezone != "undefined") {
-      validateTimezone(options.timezone);
+    if (options.timezone) {
       return convertToUTC(date, options.timezone);
     }
 
