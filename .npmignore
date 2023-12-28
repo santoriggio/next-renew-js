@@ -17,7 +17,7 @@ src/
 *.config.js
 
 # Test files
-test/
+tests/
 *.test.js
 
 # Documentation and demo files

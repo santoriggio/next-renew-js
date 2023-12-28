@@ -5,7 +5,7 @@ import validator from "../validators";
 const defaultOptions: MonthlyRenewOptions = {
   monthDay: 1,
 };
-export default function monthlyRenew(options: MonthlyRenewOptions = defaultOptions) {
+export default function monthlyRenew(options: MonthlyRenewOptions = defaultOptions): Date {
   try {
     const date = cloneDate(options.from, options.useLocale);
     date.setUTCSeconds(0, 0);
@@ -77,7 +77,7 @@ export default function monthlyRenew(options: MonthlyRenewOptions = defaultOptio
     }
 
     if (options.timezone) {
-      return convertToUTC(date, options.timezone);
+      convertToUTC(date, options.timezone);
     }
 
     date.setUTCHours(hours, minutes);

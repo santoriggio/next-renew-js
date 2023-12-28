@@ -151,6 +151,6 @@ describe("edge cases", () => {
   });
 });
 
-//TODO: aggiungere test con errori
+//TODO: add error cases
 
-describe.skip("errors", () => {});
+describe.skip("error cases", () => {});

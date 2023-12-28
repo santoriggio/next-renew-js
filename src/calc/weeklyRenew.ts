@@ -1,15 +1,7 @@
 import { time } from "console";
 import { days } from "..";
 import { DailyRenewOptions, WeeklyRenewOptions } from "../types";
-import {
-  cloneDate,
-  convertToUTC,
-  dateToLocale,
-  daysToMillis,
-  hoursToMillis,
-  minutesToMillis,
-  giorniDiDistanza,
-} from "../utils";
+import { cloneDate, convertToUTC, daysToMillis, weekDayDistance } from "../utils";
 import validator from "../validators";
 
 /**
@@ -23,7 +15,6 @@ const defaultOptions: WeeklyRenewOptions = {
 export default function weeklyRenew(options: WeeklyRenewOptions = defaultOptions): Date {
   try {
     const date = cloneDate(options.from, options.useLocale);
-    //Set the seconds and milliseconds at 0
 
     date.setUTCSeconds(0, 0);
 
@@ -66,10 +57,10 @@ export default function weeklyRenew(options: WeeklyRenewOptions = defaultOptions
     let difference: number;
 
     if (currentMillis >= millis) {
-      difference = giorniDiDistanza(currentDay, weekDay) + 7 * (interval - 1);
+      difference = weekDayDistance(currentDay, weekDay) + 7 * (interval - 1);
     } else {
       if (weekDay != currentDay) {
-        difference = giorniDiDistanza(currentDay, weekDay);
+        difference = weekDayDistance(currentDay, weekDay);
       }
     }
 
@@ -78,7 +69,7 @@ export default function weeklyRenew(options: WeeklyRenewOptions = defaultOptions
     date.setUTCHours(hours, minutes);
 
     if (options.timezone) {
-      return convertToUTC(date, options.timezone);
+      convertToUTC(date, options.timezone);
     }
 
     return date;

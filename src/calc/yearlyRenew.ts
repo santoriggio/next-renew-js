@@ -7,7 +7,8 @@ const defaultOptions: YearlyRenewOptions = {
   monthDay: 1,
   month: 0,
 };
-export default function yearlyRenew(options: YearlyRenewOptions = defaultOptions) {
+
+export default function yearlyRenew(options: YearlyRenewOptions = defaultOptions): Date {
   try {
     const date = cloneDate(options.from, options.useLocale);
     date.setUTCSeconds(0, 0);
@@ -91,7 +92,7 @@ export default function yearlyRenew(options: YearlyRenewOptions = defaultOptions
     }
 
     if (options.timezone) {
-      return convertToUTC(date, options.timezone);
+      convertToUTC(date, options.timezone);
     }
 
     date.setUTCHours(hours, minutes);
