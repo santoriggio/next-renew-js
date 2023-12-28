@@ -6,11 +6,11 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest --watchAll --verbose",
-    "test:utils": "jest test/utils.test.js --verbose",
-    "test:dailyRenew": "jest --watch test/calc/dailyRenew.test.js --verbose",
-    "test:weeklyRenew": "jest --watch test/calc/weeklyRenew.test.js --verbose",
-    "test:yearlyRenew": "jest --watch test/calc/yearlyRenew.test.js --verbose",
-    "test:monthlyRenew": "jest --watch test/calc/monthlyRenew.test.js --verbose"
+    "test:utils": "jest tests/utils.test.js --verbose",
+    "test:dailyRenew": "jest --watch tests/calc/dailyRenew.test.js --verbose",
+    "test:weeklyRenew": "jest --watch tests/calc/weeklyRenew.test.js --verbose",
+    "test:yearlyRenew": "jest --watch tests/calc/yearlyRenew.test.js --verbose",
+    "test:monthlyRenew": "jest --watch tests/calc/monthlyRenew.test.js --verbose"
   },
   "repository": {
     "type": "git",
