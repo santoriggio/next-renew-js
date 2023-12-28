@@ -1,21 +1,17 @@
 import { time } from "console";
 import { DailyRenewOptions } from "../types";
-import { cloneDate, convertToUTC, dateToLocale } from "../utils";
-import validator, {
-  validateHours,
-  validateInterval,
-  validateMinutes,
-  validateTimezone,
-} from "../validators";
+import { cloneDate, convertToUTC, hoursToMillis } from "../utils";
+import validator from "../validators";
 
 /**
  * @return date
  */
 
-export default function dailyRenew(options: DailyRenewOptions = {}): Date {
+const defaultOptions: DailyRenewOptions = {};
+
+export default function dailyRenew(options: DailyRenewOptions = defaultOptions): Date {
   try {
     const date = cloneDate(options.from, options.useLocale);
-    //Set the seconds and milliseconds at 0
 
     date.setUTCSeconds(0, 0);
 
@@ -43,18 +39,18 @@ export default function dailyRenew(options: DailyRenewOptions = {}): Date {
     const currentHours = date.getUTCHours();
     const currentMinutes = date.getUTCMinutes();
     const currentDate = date.getUTCDate();
-    const float = hours + minutes / 100;
-    const currentFloat = currentHours + currentMinutes / 100;
 
-    if (currentFloat >= float) {
-      //
+    const millis = hoursToMillis(hours, minutes);
+    const currentMillis = hoursToMillis(currentHours, currentMinutes);
+
+    if (currentMillis >= millis) {
       date.setUTCDate(currentDate + interval);
     }
 
     date.setUTCHours(hours, minutes);
 
     if (options.timezone) {
-      return convertToUTC(date, options.timezone);
+      convertToUTC(date, options.timezone);
     }
 
     return date;

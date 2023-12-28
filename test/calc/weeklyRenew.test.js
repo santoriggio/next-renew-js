@@ -5,6 +5,5 @@ describe("basic function", () => {
     const result = weeklyRenew({
       weekDay: 2,
     });
-    console.log(result);
   });
 });

@@ -15,7 +15,6 @@ export default function validator(options: ValidatorOptions) {
           if (typeof value !== "number") {
             isValid = false;
           }
-
           if (typeof rule.min != "undefined" && value < rule.min) {
             isValid = false;
           }
@@ -35,10 +34,14 @@ export default function validator(options: ValidatorOptions) {
           if (rule.isTimezone) {
             isValid = isValidTimeZone(value);
           }
-
           break;
         case "date":
           if (!(value instanceof Date)) {
+            isValid = false;
+          }
+          break;
+        case "boolean":
+          if (typeof value !== "boolean") {
             isValid = false;
           }
           break;

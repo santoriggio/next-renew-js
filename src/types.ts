@@ -133,6 +133,25 @@ export type WeeklyRenewOptions = {
   timezone?: string;
   useLocale?: boolean;
 };
+export type MonthlyRenewOptions = {
+  interval?: number;
+  from?: Date;
+  hours?: number;
+  minutes?: number;
+  monthDay: number;
+  timezone?: string;
+  useLocale?: boolean;
+};
+export type YearlyRenewOptions = {
+  interval?: number;
+  from?: Date;
+  hours?: number;
+  minutes?: number;
+  monthDay: number;
+  month: number;
+  timezone?: string;
+  useLocale?: boolean;
+};
 
 export type ValidatorOptions = {
   value: any;
@@ -141,7 +160,7 @@ export type ValidatorOptions = {
   rules: Rule[];
 };
 
-type Rule = StringRule | NumberRule | DateRule;
+type Rule = StringRule | NumberRule | DateRule | BooleanRule
 
 type StringRule = {
   type: "string";
@@ -156,4 +175,8 @@ type NumberRule = {
 
 type DateRule = {
   type: "date";
+};
+
+type BooleanRule = {
+  type: "boolean";
 };

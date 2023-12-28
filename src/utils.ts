@@ -1,4 +1,10 @@
-import validator, { validateDate, validateTimezone } from "./validators";
+import validator, { validateDate } from "./validators";
+
+export function monthsToMillis(months: number, days?: number, hours?: number, minutes?: number) {
+  const d = daysToMillis(days, hours, minutes);
+
+  return months * 2629746000 + d;
+}
 
 export function daysToMillis(days: number, hours?: number, minutes?: number) {
   const h = hoursToMillis(hours, minutes);
@@ -39,89 +45,111 @@ export function numDays(y: number, m: number): number {
   // return date.getUTCDate();
 }
 
-export function convertToUTC(d: Date, tz: string): Date {
-  const timezone = validator({
-    value: tz,
-    name: "timezone",
-    rules: [{ type: "string", isTimezone: true }],
-  });
-
-  const date = validator({
-    value: d,
-    name: "date",
-    defaultValue: new Date(),
-    rules: [{ type: "date" }],
-  });
-
-  if (timezone) {
-    const options: Intl.DateTimeFormatOptions = {
-      timeZone: timezone,
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: false,
-    };
-
-    const formatted = new Intl.DateTimeFormat("en-US", options).formatToParts(date);
-
-    let obj = {
-      year: 0,
-      month: 0,
-      day: 0,
-      hour: 0,
-      minute: 0,
-      second: 0,
-    };
-
-    formatted.forEach((x) => {
-      if (typeof obj[x.type] != "undefined") {
-        obj[x.type] = x.value;
-      }
+export function convertToUTC(date: Date, timezone: string) {
+  try {
+    const validTimezone = validator({
+      value: timezone,
+      name: "timezone",
+      rules: [{ type: "string", isTimezone: true }],
     });
 
-    const currentMillis = date.getTime();
+    const validDate = validator({
+      value: date,
+      name: "date",
+      rules: [{ type: "date" }],
+    });
 
-    const nextMillis = Date.UTC(
-      obj.year,
-      obj.month - 1,
-      obj.day,
-      obj.hour == 24 ? 0 : obj.hour,
-      obj.minute,
-      obj.second
-    );
+    if (validDate && validTimezone) {
+      const options: Intl.DateTimeFormatOptions = {
+        timeZone: validTimezone,
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric",
+        hour12: false,
+      };
 
-    const difference = currentMillis - nextMillis;
+      const formatted = Intl.DateTimeFormat("en-US", options).formatToParts(date);
 
-    return new Date(currentMillis + difference);
+      let obj = {
+        year: 0,
+        month: 0,
+        day: 0,
+        hour: 0,
+        minute: 0,
+        second: 0,
+      };
+
+      formatted.forEach((x) => {
+        if (typeof obj[x.type] != "undefined") {
+          obj[x.type] = x.value;
+        }
+      });
+
+      const currentMillis = date.getTime();
+
+      const nextMillis = Date.UTC(
+        obj.year,
+        obj.month - 1,
+        obj.day,
+        obj.hour == 24 ? 0 : obj.hour,
+        obj.minute,
+        obj.second
+      );
+
+      const difference = currentMillis - nextMillis;
+
+      date.setTime(currentMillis + difference);
+    }
+  } catch (error) {
+    console.error(error);
   }
-
-  return date;
 }
 
-export function cloneDate(date: Date = new Date(), locale: boolean = false): Date {
-  //TODO: Aggiungi controllo per data e locale
+export function cloneDate(date: Date, locale: boolean = false): Date {
+  try {
+    const validDate: Date = validator({
+      value: date,
+      name: "date",
+      defaultValue: new Date(),
+      rules: [{ type: "date" }],
+    });
 
-  let toReturn: Date = new Date();
+    const toReturn = new Date(validDate);
 
-  if (typeof date != "undefined" && date != null && date instanceof Date) {
-    toReturn = new Date(date.getTime());
+    const validLocale = validator({
+      value: locale,
+      name: "locale",
+      rules: [{ type: "boolean" }],
+    });
+
+    if (validLocale) {
+      convertToLocale(toReturn);
+    }
+
+    return toReturn;
+  } catch (error) {
+    console.error(error);
   }
-
-  if (locale) {
-    toReturn = dateToLocale(date);
-  }
-
-  return toReturn;
 }
 
-export function dateToLocale(date: Date): Date {
-  validateDate(date);
+export function convertToLocale(date: Date) {
+  try {
+    const validDate = validator({
+      value: date,
+      name: "date",
+      rules: [{ type: "date" }],
+    });
 
-  const offsetMinutes = date.getTimezoneOffset();
+    if (validDate) {
+      const offsetMinutes = date.getTimezoneOffset();
+      const offsetMillis = date.getTime() - offsetMinutes * 60 * 1000;
 
-  // Calcola la data locale aggiungendo l'offset
-  return new Date(date.getTime() - offsetMinutes * 60 * 1000);
+      date.setTime(offsetMillis);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 }

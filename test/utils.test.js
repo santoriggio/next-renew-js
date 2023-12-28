@@ -2,8 +2,10 @@ import { time } from "console";
 import { convertToUTC } from "../src/utils";
 import { isValidTimeZone } from "../src/validators";
 
+//TODO: Aggiungi i test per tutte le funzioni dentro gli utils
+
 describe("timezones", () => {
-  let startingDate = new Date("2023-01-10T00:00:00.000Z");
+  let startingDate = new Date();
 
   beforeEach(() => {
     startingDate = new Date("2023-01-10T00:00:00.000Z");
