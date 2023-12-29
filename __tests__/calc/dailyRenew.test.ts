@@ -1,64 +1,80 @@
-import weeklyRenew from "../../src/calc/weeklyRenew";
+import dailyRenew from "../../src/calc/dailyRenew";
 
 describe("basic cases", () => {
   let startingDate = new Date();
   beforeEach(() => {
-    startingDate = new Date("2023-01-04T12:00:00.000Z");
+    startingDate = new Date("2023-01-01T12:00:00.000Z");
   });
 
   it("basic config", () => {
-    const res = weeklyRenew({
-      weekDay: 2,
-    });
-
-    expect(res).toBeInstanceOf(Date);
+    const result = dailyRenew();
+    expect(result).toBeInstanceOf(Date);
   });
 
   it("with startingDate without hours and minutes", () => {
-    const res = weeklyRenew({
+    startingDate.setUTCHours(0, 0);
+
+    const result = dailyRenew({
       from: startingDate,
-      weekDay: 5,
     });
 
-    const expectedDate = new Date("2023-01-06T00:00:00.000Z");
+    const expectedDate = new Date(startingDate);
+    expectedDate.setUTCDate(expectedDate.getUTCDate() + 1);
 
-    expect(res).toBeInstanceOf(Date);
-    expect(res).toEqual(expectedDate);
+    expect(result).toBeInstanceOf(Date);
+    expect(result).toEqual(expectedDate);
   });
 
   it("with startingDate with hours and minutes", () => {
-    const res = weeklyRenew({
+    const result = dailyRenew({
       from: startingDate,
-      weekDay: 5,
-      hours: 12,
-      minutes: 13,
+      hours: startingDate.getUTCHours(),
+      minutes: startingDate.getUTCMinutes(),
     });
 
-    const expectedDate = new Date("2023-01-06T12:13:00.000Z");
+    const expectedDate = new Date(startingDate);
+    expectedDate.setUTCDate(expectedDate.getUTCDate() + 1);
+
+    expect(result).toBeInstanceOf(Date);
+    expect(result).toEqual(expectedDate);
+  });
+
+  it("before renew", () => {
+    const res = dailyRenew({
+      from: startingDate,
+      hours: 15,
+    });
+
+    const expectedDate = new Date(startingDate);
+    expectedDate.setUTCHours(15);
 
     expect(res).toBeInstanceOf(Date);
     expect(res).toEqual(expectedDate);
   });
 
-  it("startingDate before renew", () => {
-    const res = weeklyRenew({
+  it("after renew", () => {
+    const res = dailyRenew({
       from: startingDate,
-      weekDay: 5,
+      hours: 8,
     });
 
-    const expectedDate = new Date("2023-01-06T00:00:00.000Z");
+    const expectedDate = new Date(startingDate);
+    expectedDate.setUTCDate(expectedDate.getUTCDate() + 1);
+    expectedDate.setUTCHours(8);
 
     expect(res).toBeInstanceOf(Date);
     expect(res).toEqual(expectedDate);
   });
 
-  it("startingDate after renew", () => {
-    const res = weeklyRenew({
+  it("timezone America/New_York", () => {
+    startingDate.setUTCHours(0, 0, 0, 0);
+
+    const res = dailyRenew({
       from: startingDate,
-      weekDay: 2,
+      timezone: "America/New_York",
     });
 
-    const expectedDate = new Date("2023-01-10T00:00:00.000Z");
+    const expectedDate = new Date("2023-01-02T05:00:00.000Z");
 
     expect(res).toBeInstanceOf(Date);
     expect(res).toEqual(expectedDate);
@@ -68,68 +84,61 @@ describe("basic cases", () => {
 describe("edge cases", () => {
   let startingDate = new Date();
   beforeEach(() => {
-    startingDate = new Date("2023-01-04T12:00:00.000Z");
+    startingDate = new Date("2023-01-01T12:00:00.000Z");
   });
 
   it("interval from 1 to 1000", () => {
-    const expectedDate = new Date("2023-01-10T12:00:00.000Z");
-
     for (let i = 1; i <= 1000; i++) {
-      const res = weeklyRenew({
+      const res = dailyRenew({
         from: startingDate,
-        weekDay: 2,
         interval: i,
       });
 
-      if (i > 1) {
-        expectedDate.setUTCDate(expectedDate.getUTCDate() + 7);
-      }
+      const expectedDate = new Date(startingDate);
+      expectedDate.setUTCDate(expectedDate.getUTCDate() + i);
 
       expectedDate.setUTCHours(0, 0, 0, 0);
+
       expect(res).toBeInstanceOf(Date);
       expect(res).toEqual(expectedDate);
     }
   });
   it("interval from 1 to 1000 with custom hours and minutes", () => {
-    const expectedDate = new Date("2023-01-10T12:00:00.000Z");
+    const startingDate = new Date("2023-01-01T18:00:00.000Z");
 
     for (let i = 1; i <= 1000; i++) {
-      const res = weeklyRenew({
+      const res = dailyRenew({
         from: startingDate,
-        weekDay: 2,
+        interval: i,
         hours: 15,
         minutes: 13,
-        interval: i,
       });
 
-      if (i > 1) {
-        expectedDate.setUTCDate(expectedDate.getUTCDate() + 7);
-      }
+      const expectedDate = new Date(startingDate);
+      expectedDate.setUTCDate(expectedDate.getUTCDate() + i);
 
       expectedDate.setUTCHours(15, 13, 0, 0);
+
       expect(res).toBeInstanceOf(Date);
       expect(res).toEqual(expectedDate);
     }
   });
   it("minutes to 1", () => {
-    const res = weeklyRenew({
+    const res = dailyRenew({
       from: startingDate,
       minutes: 1,
-      weekDay: 2,
     });
 
-    const expectedDate = new Date("2023-01-10T00:01:00.000Z");
+    const expectedDate = new Date("2023-01-02T00:01:00.000Z");
     expect(res).toBeInstanceOf(Date);
     expect(res).toEqual(expectedDate);
   });
   it("before last minute of day", () => {
     startingDate.setUTCHours(23, 58);
-
-    const res = weeklyRenew({
+    const res = dailyRenew({
       from: startingDate,
       hours: 23,
       minutes: 59,
-      weekDay: 3,
     });
 
     const expectedDate = new Date(startingDate);
@@ -139,17 +148,16 @@ describe("edge cases", () => {
     expect(res).toEqual(expectedDate);
   });
   it("after last minute of day", () => {
-    startingDate.setUTCHours(23, 59);
-    const res = weeklyRenew({
+    startingDate.setUTCHours(23, 58);
+    const res = dailyRenew({
       from: startingDate,
       hours: 23,
-      minutes: 58,
-      weekDay: 3,
+      minutes: 57,
     });
 
     const expectedDate = new Date(startingDate);
-    expectedDate.setUTCDate(expectedDate.getUTCDate() + 7);
-    expectedDate.setUTCMinutes(58);
+    expectedDate.setUTCDate(expectedDate.getUTCDate() + 1);
+    expectedDate.setUTCMinutes(57);
 
     expect(res).toBeInstanceOf(Date);
     expect(res).toEqual(expectedDate);
@@ -158,36 +166,17 @@ describe("edge cases", () => {
 
 describe("error cases", () => {
   let startingDate = new Date();
-
   beforeEach(() => {
-    startingDate = new Date("2023-01-04T12:00:00.000Z");
+    startingDate = new Date("2023-01-01T12:00:00.000Z");
   });
-  it("invalid weekDay", () => {
-    const cases = ["2", "oo", true, false, [], {}, undefined, null, -10, -340, -20, 7, 10, 30];
 
-    for (const err of cases) {
-      const res = weeklyRenew({
-        from: startingDate,
-        weekDay: err,
-      });
-
-      const expectedDate = new Date(startingDate);
-      expectedDate.setUTCDate(8);
-
-      expectedDate.setUTCHours(0, 0, 0, 0);
-
-      expect(res).toBeInstanceOf(Date);
-      expect(res).toEqual(expectedDate);
-    }
-  });
   it("invalid interval", () => {
     const cases = ["2", "oo", true, false, [], {}, undefined, null, -10, -340, -20];
 
     for (const err of cases) {
-      const res = weeklyRenew({
+      const res = dailyRenew({
         from: startingDate,
-        interval: err,
-        weekDay: 4,
+        interval: err as number,
       });
 
       const expectedDate = new Date(startingDate);
@@ -203,10 +192,9 @@ describe("error cases", () => {
     const cases = ["2", "oo", true, false, [], {}, undefined, null, -10, 100];
 
     for (const err of cases) {
-      const res = weeklyRenew({
+      const res = dailyRenew({
         from: startingDate,
-        hours: err,
-        weekDay: 4,
+        hours: err as number,
       });
 
       const expectedDate = new Date(startingDate);
@@ -222,10 +210,9 @@ describe("error cases", () => {
     const cases = ["2", "oo", true, false, [], {}, undefined, null, -30, 1304];
 
     for (const err of cases) {
-      const res = weeklyRenew({
+      const res = dailyRenew({
         from: startingDate,
-        minutes: err,
-        weekDay: 4,
+        minutes: err as number,
       });
 
       const expectedDate = new Date(startingDate);

@@ -17,8 +17,8 @@ src/
 *.config.js
 
 # Test files
-tests/
-*.test.js
+__tests__/
+*.test.ts
 
 # Documentation and demo files
 docs/
@@ -35,5 +35,5 @@ examples/
 .package-lock.json
 .yarn.lock
 
-
-index.js
+# Babel
+babel.config.js
