@@ -1,6 +1,4 @@
-import { time } from "console";
-import { days } from "..";
-import { DailyRenewOptions, WeeklyRenewOptions } from "../types";
+import { WeeklyRenewOptions } from "../types";
 import { cloneDate, convertToUTC, daysToMillis, weekDayDistance } from "../utils";
 import validator from "../validators";
 

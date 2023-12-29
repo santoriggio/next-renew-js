@@ -1,12 +1,13 @@
 {
   "name": "next-renew-js",
-  "version": "1.0.5",
-  "description": "",
+  "version": "1.0.6",
+  "description": "A versatile JavaScript library for efficiently scheduling and managing upcoming renewals on a daily, weekly, monthly, or annual basis.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest --watchAll --verbose",
-    "test:utils": "jest __tests__/utils.test.js --verbose",
+    "test:utils": "jest --watch __tests__/utils.test.ts --verbose",
+    "test:nextRenew": "jest --watch __tests__/nextRenew.test.ts --verbose",
     "test:dailyRenew": "jest --watch __tests__/calc/dailyRenew.test.ts --verbose",
     "test:weeklyRenew": "jest --watch __tests__/calc/weeklyRenew.test.ts --verbose",
     "test:yearlyRenew": "jest --watch __tests__/calc/yearlyRenew.test.ts --verbose",

@@ -1,8 +1,14 @@
 import { time } from "console";
-import { convertToUTC } from "../src/utils";
+import { DAY, HOUR, MINUTE, MONTH } from "../src/index";
+import {
+  convertToUTC,
+  monthsToMillis,
+  daysToMillis,
+  hoursToMillis,
+  minutesToMillis,
+  weekDayDistance,
+} from "../src/utils";
 import { isValidTimeZone } from "../src/validators";
-
-//TODO: Aggiungi i test per tutte le funzioni dentro gli utils
 
 describe("timezones", () => {
   let startingDate = new Date();
@@ -28,14 +34,170 @@ describe("timezones", () => {
 
   for (const timezone of keys) {
     it(timezone, () => {
-      //startingDate.setUTCHours(0, 0);
       if (isValidTimeZone(timezone)) {
-        const converted = convertToUTC(startingDate, timezone);
+        convertToUTC(startingDate, timezone);
 
-        expect(converted).toBeInstanceOf(Date);
+        expect(startingDate).toBeInstanceOf(Date);
 
-        expect(converted).toEqual(timezones[timezone]);
+        expect(startingDate).toEqual(timezones[timezone]);
       }
     });
   }
+});
+
+export function getRandomValue(max: number = 1): number {
+  const min = 1;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+describe("monthsToMillis", () => {
+  describe("basic cases", () => {
+    it("basic config with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = monthsToMillis(i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(MONTH * i);
+      }
+    });
+    it("with days with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = monthsToMillis(i, i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(MONTH * i + DAY * i);
+      }
+    });
+    it("with hours with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = monthsToMillis(i, i, i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(MONTH * i + DAY * i + HOUR * i);
+      }
+    });
+    it("with minutes with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = monthsToMillis(i, i, i, i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(MONTH * i + DAY * i + HOUR * i + MINUTE * i);
+      }
+    });
+  });
+});
+describe("daysToMillis", () => {
+  describe("basic cases", () => {
+    it("with days with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = daysToMillis(i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(DAY * i);
+      }
+    });
+    it("with hours with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = daysToMillis(i, i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(DAY * i + HOUR * i);
+      }
+    });
+    it("with minutes with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = daysToMillis(i, i, i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(DAY * i + HOUR * i + MINUTE * i);
+      }
+    });
+  });
+});
+describe("hoursToMillis", () => {
+  describe("basic cases", () => {
+    it("with hours with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = hoursToMillis(i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(HOUR * i);
+      }
+    });
+    it("with minutes with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = hoursToMillis(i, i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(HOUR * i + MINUTE * i);
+      }
+    });
+  });
+});
+describe("minutesToMillis", () => {
+  describe("basic cases", () => {
+    it("with minutes with random values", () => {
+      for (let i = 0; i < 1000; i++) {
+        const res = minutesToMillis(i);
+
+        expect(res).toBeDefined();
+        expect(res).toEqual(MINUTE * i);
+      }
+    });
+  });
+});
+describe("weekDayDistance", () => {
+  describe("basic cases", () => {
+    it("start day < end day", () => {
+      const res = weekDayDistance(1, 3);
+      expect(res).toBeDefined();
+      expect(res).toEqual(2);
+    });
+    it("start day > end day", () => {
+      const res = weekDayDistance(3, 1);
+      expect(res).toBeDefined();
+      expect(res).toEqual(5);
+    });
+  });
+  describe("edge cases", () => {
+    it("start day == end day", () => {
+      const res = weekDayDistance(3, 3);
+      expect(res).toBeDefined();
+      expect(res).toEqual(7);
+    });
+    it("start day == 0", () => {
+      const res = weekDayDistance(0, 3);
+      expect(res).toBeDefined();
+      expect(res).toEqual(3);
+    });
+    it("end day == 0", () => {
+      const res = weekDayDistance(3, 0);
+      expect(res).toBeDefined();
+      expect(res).toEqual(4);
+    });
+  });
+  describe("error cases", () => {
+    const cases = ["2", "oo", true, false, [], {}, undefined, null, -10, 7, 10, -1];
+    it("invalid start day", () => {
+      for (const err of cases) {
+        const res = weekDayDistance(err as number, 3);
+
+        expect(res).toBeNull();
+      }
+    });
+    it("invalid end day", () => {
+      for (const err of cases) {
+        const res = weekDayDistance(3, err as number);
+
+        expect(res).toBeNull();
+      }
+    });
+    it("invalid start & end day", () => {
+      for (const err of cases) {
+        const res = weekDayDistance(err as number, err as number);
+
+        expect(res).toBeNull();
+      }
+    });
+  });
 });

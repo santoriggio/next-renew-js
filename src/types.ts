@@ -7,19 +7,6 @@ export type NextRenewReturn = {
 
 export type NextRenewOptions = {
   /**
-   * Represents the interval in which the renewal occurs.
-   * @type {number}
-   * @example
-   *   An interval of 2 means the renewal occurs every two days, weeks, months, or years.
-   */
-  interval?: number;
-
-  /**
-   * Specifies the starting date from which the renewal should begin.
-   */
-  from?: Date;
-
-  /**
    *  Indicates the total number of renewals that should occur.
    */
   numberOfRenewals?: number;
@@ -29,92 +16,17 @@ export type NextRenewOptions = {
    */
   end_date?: Date;
 
-  // /**
-  //  * Specifies the hours at which the renewal should take place.
-  //  * By default, the renewal occurs at midnight (0 hours).
-  //  * @type number
-  //  * @default 0
-  //  */
-  // hours?: number;
-
-  // /**
-  //  * Specifies the minutes at which the renewal should take place.
-  //  * By default, the renewal occurs at the beginning of the specified hour (0 minutes).
-  //  * @type number
-  //  * @default 0
-  //  */
-  // minutes?: number;
-
-  /**
-   * Specifies the timezone in which the renewals should occur.
-   * @type {string}
-   * @example
-   * If the renewal is scheduled for midnight on December 21, and the timezone is set to "America/New_York",
-   * the returned value will be at 18:00 (6:00 PM) on the previous day, accounting for the -6-hour offset from UTC.
-   */
-  timezone?: string;
-
-  monthDay?: number;
   month?: number;
+  monthDay?: number;
   weekDay?: number;
-} & (NextRenewDay | NextRenewWeek | NextRenewMonth | NextRenewYear);
+} & (
+  | Typed<DailyRenewOptions, "day">
+  | Typed<WeeklyRenewOptions, "week">
+  | Typed<MonthlyRenewOptions, "month">
+  | Typed<YearlyRenewOptions, "year">
+);
 
-type NextRenewDay = {
-  /**
-   * Specifies that the renewal happens daily.
-   */
-  type: "day";
-};
-
-type NextRenewWeek = {
-  /**
-   * Specifies that the renewal happens weekly.
-   */
-  type: "week";
-
-  /**
-   * Specifies the day of the week (0 for Monday, and so on).
-   * Accepted values are in the range between 0 and 6.
-   * @type number
-   */
-  weekDay: number;
-};
-
-type NextRenewMonth = {
-  /**
-   * Specifies that the renewal happens monthly.
-   */
-  type: "month";
-
-  /**
-   * Specifies the day of the month when the renewal should happen.
-   * Accepted values are in the range between 1 and 31.
-   * @type number
-   */
-  monthDay: number;
-};
-
-type NextRenewYear = {
-  /**
-   *  Specifies that the renewal happens yearly.
-   */
-  type: "year";
-
-  /**
-   * Specifies the day of the month when the renewal should happen.
-   * Accepted values are in the range between 1 and 31.
-   * @type number
-   */
-  monthDay: number;
-
-  /**
-   * Specifies the month of the year when the yearly renewal should happen.
-   * Accepted values are in the range between 0 and 11.
-   * @type {number}
-   */
-
-  month: number;
-};
+type Typed<T, E extends string> = T & { type: E };
 
 export type DailyRenewOptions = {
   interval?: number;
@@ -124,6 +36,7 @@ export type DailyRenewOptions = {
   timezone?: string;
   useLocale?: boolean;
 };
+
 export type WeeklyRenewOptions = {
   interval?: number;
   from?: Date;
@@ -133,6 +46,7 @@ export type WeeklyRenewOptions = {
   timezone?: string;
   useLocale?: boolean;
 };
+
 export type MonthlyRenewOptions = {
   interval?: number;
   from?: Date;
@@ -142,6 +56,7 @@ export type MonthlyRenewOptions = {
   timezone?: string;
   useLocale?: boolean;
 };
+
 export type YearlyRenewOptions = {
   interval?: number;
   from?: Date;
@@ -160,7 +75,7 @@ export type ValidatorOptions = {
   rules: Rule[];
 };
 
-type Rule = StringRule | NumberRule | DateRule | BooleanRule
+type Rule = StringRule | NumberRule | DateRule | BooleanRule;
 
 type StringRule = {
   type: "string";

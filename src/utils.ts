@@ -1,21 +1,27 @@
+import { MONTH, DAY, HOUR, MINUTE } from ".";
 import validator, { validateDate } from "./validators";
 
-export function monthsToMillis(months: number, days?: number, hours?: number, minutes?: number) {
+export function monthsToMillis(
+  months: number = 0,
+  days: number = 0,
+  hours: number = 0,
+  minutes: number = 0
+) {
   const d = daysToMillis(days, hours, minutes);
 
-  return months * 2629746000 + d;
+  return months * MONTH + d;
 }
-export function daysToMillis(days: number, hours?: number, minutes?: number) {
+export function daysToMillis(days: number = 0, hours: number = 0, minutes: number = 0) {
   const h = hoursToMillis(hours, minutes);
 
-  return days * 24 * 60 * 60 * 1000 + h;
+  return days * DAY + h;
 }
-export function hoursToMillis(hours: number, minutes?: number) {
+export function hoursToMillis(hours: number = 0, minutes: number = 0) {
   const m = minutesToMillis(minutes);
-  return hours * 60 * 60 * 1000 + m;
+  return hours * HOUR + m;
 }
-export function minutesToMillis(minutes: number) {
-  return minutes * 60 * 1000;
+export function minutesToMillis(minutes: number = 0) {
+  return minutes * MINUTE;
 }
 
 /**
